@@ -16,7 +16,7 @@ def default_error_handle(error=None):
     return jsonify(error=error.code, message=error.message, success=False), \
         error.code
 
-api_v1.add_url_rule('/videos', methods=['GET'], 
-    view_func=LazyView('image_puzzle.v1.api.handlers.get_videos'))
-api_v1.add_url_rule('/videos/<string:video_id>', methods=['GET'], 
-    view_func=LazyView('image_puzzle.v1.api.handlers.get_video'))
+api_v1.add_url_rule('/images', methods=['GET'], 
+    view_func=LazyView('image_puzzle.v1.api.handlers.get_images'))
+#api_v1.add_url_rule('/videos/<string:video_id>', methods=['GET'], 
+    #view_func=LazyView('image_puzzle.v1.api.handlers.get_video'))
