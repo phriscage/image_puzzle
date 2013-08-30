@@ -16,7 +16,11 @@ def default_error_handle(error=None):
     return jsonify(error=error.code, message=error.message, success=False), \
         error.code
 
-api_v1.add_url_rule('/images', methods=['GET'], 
+api_v1.add_url_rule('/images', methods=['GET'],
     view_func=LazyView('image_puzzle.v1.api.handlers.get_images'))
-#api_v1.add_url_rule('/videos/<string:video_id>', methods=['GET'], 
-    #view_func=LazyView('image_puzzle.v1.api.handlers.get_video'))
+api_v1.add_url_rule('/images/urls', methods=['POST'],
+    view_func=LazyView('image_puzzle.v1.api.handlers.create_image_urls'))
+api_v1.add_url_rule('/image/random', methods=['GET'], 
+    view_func=LazyView('image_puzzle.v1.api.handlers.get_image_random'))
+api_v1.add_url_rule('/image/<int:image_id>', methods=['GET'], 
+    view_func=LazyView('image_puzzle.v1.api.handlers.get_image'))

@@ -34,7 +34,7 @@ class Images(object):
         self._url = None
         self._random_create_start = 8000
         self._random_create_end = 10000
-        self._base_url = "http://openphoto.net/volumes/sizes/mike/%i/5.jpg"
+        self._base_url = "http://openphoto.net/volumes/sizes/mike/%s/5.jpg"
         self._image_urls_file_name = "%s/../data/%s" % (os.path.dirname(
             os.path.abspath(__file__)), 'image_urls.txt')
         self._image_urls = []
@@ -49,15 +49,16 @@ class Images(object):
 
     def _read_image_urls(self):
         """ read the image urls from the self._image_urls_file_name and store
-        in memory as a list, but return False if file DNE.
-        Returns:
-            True/False
+        in memory as a list, but return IOError if file DNE or 0 bytes.
+        Raise:
+            IOError
         """
         if not os.path.isfile(self._image_urls_file_name):
-            return False
+            raise IOError, "'%s' is not found" % self._image_urls_file_name
+        if os.path.getsize(self._image_urls_file_name) == 0:
+            raise IOError, "'%s' is empty" % self._image_urls_file_name
         for line in open(self._image_urls_file_name, 'r'):
             self._image_urls.append(line.strip())
-        return True
 
         
     def create_image_urls(self):
@@ -86,27 +87,47 @@ class Images(object):
         image_url_file.close()
 
 
-    def read(self):
-        """ get a random url from memory and return in a dictionary """
-        if not self._image_urls:
-            if not self._read_image_urls():
-                message = ("File does not exist: '%s'" 
-                    % self._image_urls_file_name)
-                return { 'message': message, 'success': False, 'url': None }
+    def get_image(self, image_id):
+        """ get a random url from memory and return a url, message """
+        index = int(image_id)
+        if index >= len(self._image_urls):
+            message = "Url index does not exist: '%i'" % index
+            return (None, message)
+        url = self._image_urls[index]
+        message = "Successful URL found."
+        return (url, message)
+    
+
+    def get_image_random(self):
+        """ get a random url from memory and return a url, message """
         index = random.randrange(0, len(self._image_urls_file_name))
         if index >= len(self._image_urls):
             message = "Url index does not exist: '%i'" % index
-            return { 'message': message, 'success': False, 'url': None }
+            return (None, message)
         url = self._image_urls[index]
         message = "Successful URL found."
-        return { 'message': message, 'success': True, 'url': url }
+        return (url, message)
+    
+
+    def get_images(self, start=0, limit=100):
+        """ return a list of all image urls"""
+        if not start:
+            start = 0
+        if not limit:
+            limit = 100
+        start = int(start)
+        limit = int(limit)
+        urls = self._image_urls[start:start + limit]
+        message = "%i Successful URLs found." % len(urls)
+        return (urls, message)
     
 
 def main():
     """ run the main logic """
     images = Images()
-    print images.create_image_urls()
-    #print images.read()
+    #print images.create_image_urls()
+    print images.get_image_random()
+    print images.get_image(12)
     
 
 if __name__ == '__main__':
